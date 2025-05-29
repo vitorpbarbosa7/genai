@@ -2,3 +2,6 @@ llm/Curso LLMs Projeto 01 - Transcrição e compreensão de vídeos copy.ipynb
 llm/.ipynb_checkpoints
 *ipynb_checkpoints*
 llm/Curso LLMs Projeto 01 - Transcrição e compreensão de vídeos.ipynb
+*.swp
+*.swo
+
