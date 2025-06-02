@@ -21,6 +21,31 @@ llm = ChatOpenAI(
     model="mistralai/mixtral-8x7b-instruct",
     temperature=0.3
 )
+import subprocess
+
+def render_mermaid_graph(app, mmd_file="graph.mmd", output_image="graph.png"):
+    """
+    Generate a Mermaid diagram from a LangGraph app and render it as a PNG image.
+
+    Parameters:
+    - app: The compiled LangGraph application.
+    - mmd_file (str): Filename for the Mermaid definition file.
+    - output_image (str): Filename for the output image.
+    """
+    # Generate Mermaid diagram code
+    mermaid_code = app.get_graph().draw_mermaid()
+
+    # Save Mermaid code to .mmd file
+    with open(mmd_file, "w") as f:
+        f.write(mermaid_code)
+
+    # Use mmdc to convert .mmd to .png
+    try:
+        subprocess.run(["mmdc", "-i", mmd_file, "-o", output_image], check=True)
+        print(f"\n✅ Mermaid diagram saved as {output_image}")
+    except subprocess.CalledProcessError as e:
+        print(f"\n❌ Failed to generate diagram: {e}")
+
 
 # === 📦 State Definition
 class State(TypedDict):
@@ -108,6 +133,9 @@ graph.add_edge(START, "extract_topic")
 
 app = graph.compile(checkpointer=memory)
 print(app.get_graph().draw_ascii())
+render_mermaid_graph(app)
+
+
 
 # === 🧪 Run
 #if __name__ == "__main__":
