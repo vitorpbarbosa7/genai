@@ -79,7 +79,7 @@ app = workflow.compile(checkpointer=memory)
 thread_id = str(uuid.uuid4())
 config = {"configurable": {"thread_id": thread_id}}
 
-user_query = "Can you tell me something interesting about cats?"
+user_query = "Can you tell me something interesting about spac?"
 response = app.invoke(
     {"messages": [HumanMessage(content=user_query)]},
     config=config
