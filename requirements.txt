@@ -1,3 +1,5 @@
+requests
+
 # 🔧 Core LangChain ecosystem
 langchain>=0.1.20
 langchain-community>=0.0.36

@@ -1,22 +1,17 @@
+import os
+import uuid
+import requests
 from langchain_openai import ChatOpenAI
-from langchain_community.utilities import OpenWeatherMapAPIWrapper 
-import os 
-import uuid 
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from typing_extensions import TypedDict
 from typing import Annotated
 from langgraph.graph.message import add_messages
-from pydantic import BaseModel 
 
 # === 🔐 OpenRouter Setup ===
 os.environ["OPENAI_API_KEY"] = os.getenv('ROUTER_API_KEY')
 os.environ["OPENAI_API_BASE"] = "https://openrouter.ai/api/v1"
-
-# === 🌤️ Weather API
-os.environ["OPENWEATHERMAP_API_KEY"] = "**"
-weather = OpenWeatherMapAPIWrapper()
 
 # === 🧠 LLM via OpenRouter (Mixtral)
 llm = ChatOpenAI(
@@ -50,14 +45,39 @@ def agent(state):
         "city": city_name
     }
 
-# === 🧩 Node 2: Fetch weather
+# === 🧩 Node 2: Fetch weather using Open-Meteo
 def weather_tool(state):
     city_name = state.get("city", "").strip()
 
     if not city_name:
         return {"messages": [AIMessage(content="No city name provided. Cannot fetch weather.")]}
     
-    weather_info = weather.run(city_name)
+    # Use Open-Meteo's geocoding API to get latitude and longitude
+    geocoding_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city_name}&count=1"
+    geo_response = requests.get(geocoding_url)
+    if geo_response.status_code != 200 or not geo_response.json().get("results"):
+        return {"messages": [AIMessage(content=f"Could not find coordinates for {city_name}.")]}
+    
+    geo_data = geo_response.json()["results"][0]
+    latitude = geo_data["latitude"]
+    longitude = geo_data["longitude"]
+
+    # Fetch current weather data
+    weather_url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={latitude}&longitude={longitude}&current_weather=true"
+    )
+    weather_response = requests.get(weather_url)
+    if weather_response.status_code != 200:
+        return {"messages": [AIMessage(content=f"Failed to fetch weather data for {city_name}.")]}
+    
+    weather_data = weather_response.json().get("current_weather", {})
+    temperature = weather_data.get("temperature")
+    windspeed = weather_data.get("windspeed")
+    weather_info = (
+        f"Current temperature in {city_name} is {temperature}°C with wind speed of {windspeed} km/h."
+    )
+
     return {"messages": [AIMessage(content=weather_info)]}
 
 # === ⚙️ Workflow Definition
@@ -84,4 +104,3 @@ response = app.invoke(
 
 # === 💬 Final Output
 print("🌦️ AI:", response["messages"][-1].content)
-
