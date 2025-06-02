@@ -18,6 +18,11 @@ weather = OpenWeatherMapAPIWrapper()
 MODEL = "llama3.2"
 llm = ChatOllama(model=MODEL)
 
+#** Define the State**
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+    city: str # Adding city key to track extratec city name
+
 # ** Node 1: Extract city from user input**
 def agent(state):
     # Extract latest user message
@@ -38,4 +43,42 @@ def agent(state):
     # from the llm we extract the city and return here using two keys:
     # messages and city 
     return {"messages": [AIMessage(content=f"Extracted city: {city_name}")], "city":city_name}
+
+# **Node 2: Fetch ewather information**
+def weather_tool(state):
+    # the weather tool uses state
+    # what part of the state?
+    # uses the city part
+    city_name = state.get("city", "").strip()
+
+    if not city_name:
+        return {"messages": [AIMessage(content="No city name provided. Cannot fetch weather.")]}
+
+    # call tool
+    weatehr_info = weather.info(city_name)
+    return {"messages": [AIMessage(content=weather_info)]}
+
+
+
+# Now some workflow 
+memory = MemorySaver()
+workflow = StateGraph(State)
+
+
+# ** Define transitions between nodes
+# start by some edge called agent?
+workflow.add_edge(START, "agent")
+
+# Define the nodes
+# basically the agent to ask for the city 
+# and the tool to return weather response
+workflow.add_node("agent", agent)
+workflow.add_node("weather", weather_tool)
+
+# ** Connect Nodes using edges, offcourse **
+# after the agent node runs and returns output, redirects to the weather 
+workflow.add_edge("agent", "weather")
+# after weather runs, it goes to the END of our guy langgraph
+workflow.add_edge("weather", END)
+
 
