@@ -1,3 +1,5 @@
+ipython
+notebook
 requests
 
 # 🔧 Core LangChain ecosystem

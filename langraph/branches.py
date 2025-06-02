@@ -8,6 +8,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from typing_extensions import TypedDict
 from typing import Annotated
 from langgraph.graph.message import add_messages
+from IPython.display import Image, display
+import nest_asyncio
 
 # === 🔐 OpenRouter Setup ===
 os.environ["OPENAI_API_KEY"] = os.getenv("ROUTER_API_KEY")
@@ -116,4 +118,7 @@ if __name__ == "__main__":
     print("\n🧠 Final Response:")
     for msg in response["messages"]:
         print(f"{msg.type.capitalize()}: {msg.content}")
+
+    nest_asyncio.apply()
+    display(Image(app.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.PYPPETEER)))
 
