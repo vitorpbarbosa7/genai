@@ -52,7 +52,7 @@ def extract_topic(state):
         "topic": topic
     }
     breakpoint()
-	return return_d
+    return return_d
 
 # === 🐱 Node 2A: Cat Fact
 def cat_fact(state):
@@ -64,14 +64,14 @@ def cat_fact(state):
             "topic": state["topic"],
             "fact": fact
         }
-		return return_d
+        return return_d
     except Exception as e:
         return_d = {
             "messages": state["messages"] + [AIMessage(content=f"Failed to fetch cat fact: {str(e)}")],
             "topic": state["topic"]
         }
         breakpoint()
-		return return_d
+        return return_d
 
 # === 🐶 Node 2B: Dog Image
 def dog_image(state):
@@ -84,13 +84,13 @@ def dog_image(state):
             "fact": image_url
         }
         breakpoint()
-		return return_d
+        return return_d
     except Exception as e:
         return_d = {
             "messages": state["messages"] + [AIMessage(content=f"Failed to fetch dog image: {str(e)}")],
             "topic": state["topic"]
         }
-		return return_d
+        return return_d
 
 # === ❌ Node 2C: Unsupported
 def unsupported_topic(state):
