@@ -1,0 +1,25 @@
+# 🔧 Core LangChain ecosystem
+langchain>=0.1.20
+langchain-community>=0.0.36
+langchain-openai>=0.1.6
+langchain-huggingface>=0.0.6
+langgraph>=0.0.40
+
+# 🧠 Local LLM + Ollama
+langchainhub>=0.1.14  # Optional if using LangChainHub tools
+ollama>=0.1.7          # Python client for Ollama
+
+# 🔬 PyTorch (for HF or local inference)
+torch>=2.1.0
+
+# 🌤️ Weather wrapper dependency
+pyowm>=3.3.0
+
+# 🧠 Tokenizer / Embedding utils
+tiktoken>=0.5.1
+sentence-transformers>=2.2.2
+
+# ⚙️ Optional but useful
+python-dotenv>=1.0.0
+rich>=13.7.0
+
