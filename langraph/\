@@ -55,8 +55,9 @@ def weather_tool(state):
     # Use Open-Meteo's geocoding API to get latitude and longitude
     geocoding_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city_name}&count=1"
     geo_response = requests.get(geocoding_url)
-    breakpoint()
+        breakpoint()
     if geo_response.status_code != 200 or not geo_response.json().get("results"):
+        breakpoint()
         return {"messages": [AIMessage(content=f"Could not find coordinates for {city_name}.")]}
     
     geo_data = geo_response.json()["results"][0]
