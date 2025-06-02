@@ -137,14 +137,13 @@ render_mermaid_graph(app)
 
 
 
-# === 🧪 Run
-#if __name__ == "__main__":
-#    thread_id = str(uuid.uuid4())
-#    config = {"configurable": {"thread_id": thread_id}}
-#
-#    user_query = input("💬 Ask something (e.g. tell me about cats or dogs):\n> ")
-#    response = app.invoke({"messages": [HumanMessage(content=user_query)]}, config=config)
-#
-#    print("\n🧠 Final Response:")
-#    for msg in response["messages"]:
-#        print(f"{msg.type.capitalize()}: {msg.content}")
+if __name__ == "__main__":
+    thread_id = str(uuid.uuid4())
+    config = {"configurable": {"thread_id": thread_id}}
+
+    user_query = input("💬 Ask something (e.g. tell me about cats or dogs):\n> ")
+    response = app.invoke({"messages": [HumanMessage(content=user_query)]}, config=config)
+
+    print("\n🧠 Final Response:")
+    for msg in response["messages"]:
+        print(f"{msg.type.capitalize()}: {msg.content}")
