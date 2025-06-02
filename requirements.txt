@@ -1,5 +1,11 @@
+# visualize graph
+grandalf
+graphviz
+pyppeteer
 ipython
 notebook
+
+# apis
 requests
 
 # 🔧 Core LangChain ecosystem

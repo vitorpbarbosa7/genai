@@ -9,6 +9,7 @@ from typing_extensions import TypedDict
 from typing import Annotated
 from langgraph.graph.message import add_messages
 from IPython.display import Image, display
+from langchain_core.runnables.graph import MermaidDrawMethod
 import nest_asyncio
 
 # === 🔐 OpenRouter Setup ===
@@ -106,19 +107,16 @@ graph.add_edge("unsupported", END)
 graph.add_edge(START, "extract_topic")
 
 app = graph.compile(checkpointer=memory)
+print(app.get_graph().draw_ascii())
 
 # === 🧪 Run
-if __name__ == "__main__":
-    thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
-
-    user_query = input("💬 Ask something (e.g. tell me about cats or dogs):\n> ")
-    response = app.invoke({"messages": [HumanMessage(content=user_query)]}, config=config)
-
-    print("\n🧠 Final Response:")
-    for msg in response["messages"]:
-        print(f"{msg.type.capitalize()}: {msg.content}")
-
-    nest_asyncio.apply()
-    display(Image(app.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.PYPPETEER)))
-
+#if __name__ == "__main__":
+#    thread_id = str(uuid.uuid4())
+#    config = {"configurable": {"thread_id": thread_id}}
+#
+#    user_query = input("💬 Ask something (e.g. tell me about cats or dogs):\n> ")
+#    response = app.invoke({"messages": [HumanMessage(content=user_query)]}, config=config)
+#
+#    print("\n🧠 Final Response:")
+#    for msg in response["messages"]:
+#        print(f"{msg.type.capitalize()}: {msg.content}")
