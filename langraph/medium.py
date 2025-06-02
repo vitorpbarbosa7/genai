@@ -4,7 +4,7 @@ import os
 import uuid 
 from langchain.tools import Tool
 from langchain.chat_models import ChatOllama
-from langchain_core.messages import AIMessage, HumamMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from typing_extensions import TypedDict
@@ -80,5 +80,27 @@ workflow.add_node("weather", weather_tool)
 workflow.add_edge("agent", "weather")
 # after weather runs, it goes to the END of our guy langgraph
 workflow.add_edge("weather", END)
+
+# Compile the workflow with memory checkpointer
+# checkpointer allows to save the state
+app = workflow.compile(checkpointer=memory)
+
+
+# Create a unique config dictionary to satisfy the checkpointer requirements
+config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+
+# ** Run the workflow
+user_query = "What is the weather in sao paulo?"
+# this key corresponds the one in which the first agent will read from 
+# here configured as a HumanMessage
+response = app.invoke({"messages": [HumanMessage(content=user_query)]}, config = config)
+
+# response will be after running the whole graph 
+# from the last message we will know from the last node what is the output after passing throught all nodes
+print("AI:", response["messages"][-1].content)
+
+
+
+
 
 
