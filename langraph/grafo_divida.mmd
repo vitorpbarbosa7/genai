@@ -1,0 +1,44 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	consultar_divida(consultar_divida)
+	verificar_entrada(verificar_entrada)
+	verificar_capacidade(verificar_capacidade)
+	verificar_data(verificar_data)
+	verificar_parcelas(verificar_parcelas)
+	finalizar_negociacao(finalizar_negociacao)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> consultar_divida;
+	consultar_divida -.-> finalizar_negociacao;
+	consultar_divida -.-> verificar_capacidade;
+	consultar_divida -.-> verificar_data;
+	consultar_divida -.-> verificar_entrada;
+	consultar_divida -.-> verificar_parcelas;
+	verificar_capacidade -.-> finalizar_negociacao;
+	verificar_capacidade -.-> verificar_data;
+	verificar_capacidade -.-> verificar_entrada;
+	verificar_capacidade -.-> verificar_parcelas;
+	verificar_data -.-> finalizar_negociacao;
+	verificar_data -.-> verificar_capacidade;
+	verificar_data -.-> verificar_entrada;
+	verificar_data -.-> verificar_parcelas;
+	verificar_entrada -.-> finalizar_negociacao;
+	verificar_entrada -.-> verificar_capacidade;
+	verificar_entrada -.-> verificar_data;
+	verificar_entrada -.-> verificar_parcelas;
+	verificar_parcelas -.-> finalizar_negociacao;
+	verificar_parcelas -.-> verificar_capacidade;
+	verificar_parcelas -.-> verificar_data;
+	verificar_parcelas -.-> verificar_entrada;
+	finalizar_negociacao --> __end__;
+	verificar_capacidade -.-> verificar_capacidade;
+	verificar_data -.-> verificar_data;
+	verificar_entrada -.-> verificar_entrada;
+	verificar_parcelas -.-> verificar_parcelas;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
