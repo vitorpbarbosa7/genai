@@ -20,9 +20,9 @@ pushover_url = "https://api.pushover.net/1/messages.json"
 def push_tool(msg: str) -> str:
     try:
         requests.post(pushover_url, data={"token": pushover_token, "user": pushover_user, "message": msg})
-        return "✅ Push notification sent."
+        return "✅ Notificação enviada."
     except Exception as e:
-        return f"❌ Failed to send push: {str(e)}"
+        return f"❌ Falha ao enviar: {str(e)}"
 
 # === State ===
 class State(TypedDict):
@@ -42,33 +42,29 @@ def llm_node(state: State) -> State:
     system_prompt = {
         "role": "system",
         "content": (
-            "You are a JSON-only assistant. If the user asks to send some message, notification, push, something like that, respond with a JSON object like:\n\n"
-            '{\n  "intent": "push",\n  "push_text": "message to send"\n}\n\n'
-            "If no push is needed, that is, if the human user does not ask to send anything, just reply:\n"
-            '{\n  "intent": "end",\n  "push_text": ""\n}\n\n'
-            "Respond ONLY with JSON. Do not explain or talk outside the JSON."
+            "You are a JSON-only assistant. If the user asks to send a message, notification, or push, "
+            "respond ONLY with a JSON object:\n"
+            '{ "intent": "push", "push_text": "message to send" }\n'
+            "If no push is needed, respond with:\n"
+            '{ "intent": "end", "push_text": "" }'
         )
     }
-    # keep history
     messages = [system_prompt] + state["messages"]
     response = llm.invoke(messages)
 
-    # Try to parse JSON response
     try:
-        raw = response.content.strip()
-        parsed = json.loads(raw)
+        parsed = json.loads(response.content.strip())
         state["intent"] = parsed.get("intent", "end")
         state["push_text"] = parsed.get("push_text", "")
-    except Exception as e:
+    except Exception:
         state["intent"] = "end"
         state["push_text"] = ""
         state["messages"].append({
             "role": "assistant",
-            "content": f"❌ Failed to parse JSON. Raw: {response.content}"
+            "content": f"❌ JSON inválido: {response.content}"
         })
         return state
 
-    # Also append the actual assistant message
     state["messages"].append({
         "role": "assistant",
         "content": response.content
@@ -77,27 +73,23 @@ def llm_node(state: State) -> State:
 
 def push_node(state: State) -> State:
     result = push_tool(state["push_text"])
-    breakpoint()
     state["messages"].append({"role": "tool", "name": "send_push_notification", "content": result})
     return state
 
 def route_decision(state: State) -> str:
     return state["intent"]
 
-# === Graph ===
+# === Build Graph ===
 graph_builder = StateGraph(State)
-
 graph_builder.add_node("llm", llm_node)
 graph_builder.add_node("push", push_node)
 
-# ✅ Only set conditional routing via add_conditional_edges
 graph_builder.set_entry_point("llm")
 graph_builder.add_conditional_edges("llm", route_decision, {
     "push": "push",
     "end": END
 })
 graph_builder.add_edge("push", END)
-
 graph = graph_builder.compile()
 
 # === Gradio UI ===
@@ -105,12 +97,25 @@ def chat(user_input: str, history):
     try:
         messages = [{"role": "user", "content": user_input}]
         result = graph.invoke({"messages": messages, "intent": "", "push_text": ""})
-        breakpoint()
-        return result["messages"][-1].content
+
+        if result.get("intent") == "end":
+            # End conversation with a clear message
+            return "👍 Entendi. Nenhuma notificação será enviada. Encerrando conversa."
+
+        if result.get("intent") == "push":
+            return f"📬 Notificação enviada com sucesso: {result['push_text']}"
+
+        return result["messages"][-1]["content"]
+
     except Exception as e:
         traceback.print_exc()
-        return f"❌ Error: {str(e)}"
+        return f"❌ Erro: {str(e)}"
 
-# Launch Gradio app
-gr.ChatInterface(chat, type="messages").launch()
+# === Launch Gradio
+gr.ChatInterface(
+    fn=chat,
+    type="messages",
+    title="📲 Assistente de Push Notifications",
+    description="Peça para enviar uma notificação push ou finalize a conversa."
+).launch()
 
