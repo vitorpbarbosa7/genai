@@ -4,4 +4,8 @@ llm/.ipynb_checkpoints
 llm/Curso LLMs Projeto 01 - Transcrição e compreensão de vídeos.ipynb
 *.swp
 *.swo
+*.env*
+**/*.env*
+.env
+
 

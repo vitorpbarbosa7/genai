@@ -1,3 +1,7 @@
+# rag, vector db
+pymongo
+sentence-transformers
+
 fastapi
 uvicorn
 streamlit
