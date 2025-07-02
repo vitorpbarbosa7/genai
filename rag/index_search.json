@@ -1,0 +1,12 @@
+{
+  "mappings": {
+    "dynamic": true,
+    "fields":{
+      "plot_embeddding_hf": {        
+          "dimensions": 384,
+          "similarity": "dotProduct",
+          "type": "knnVector"
+        }
+    }
+  }
+}
